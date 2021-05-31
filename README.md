@@ -1,7 +1,7 @@
 # aframe-daylight-system
 
 
-W.I.P Component. Based on <a href="https://github.com/feiss/aframe-environment-component">aframe-environment-component </a> a simple daylight system with latituda and hour inputs.
+W.I.P Component. Based on <a href="https://github.com/feiss/aframe-environment-component">aframe-environment-component </a> a simple daylight system with latitude and hour inputs.
 
 
 ![Example Image](https://github.com/EX3D/aframe-InstancedMesh/blob/master/aframe%20instancedmesh%20Example.jpg)
