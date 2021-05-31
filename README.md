@@ -12,11 +12,11 @@ This uses vec3 conversion from sun azimuth and sun altitude equations.
 
 ## WIP
 
-- Add North Offset
+- Implement schema components: Longitude (adds variance to both sun altitude and azimuth. See: https://en.wikipedia.org/wiki/Solar_azimuth_angle)...........done
 
-- Implement schema components: Longitude (adds variance to both sun altitude and azimuth. See: https://en.wikipedia.org/wiki/Solar_azimuth_angle)
+- Add North Offset.......wip
 
-- Merge  light object functionality from aframe-environment-component or convince the to add this kind of input. That would be awesome.
+- Merge  light object functionality from aframe-environment-component or convince the to add this kind of input. That would be awesome........wip
 
 
 ### A-Frame entity notation
