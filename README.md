@@ -27,9 +27,12 @@ This uses vec3 conversion from sun azimuth and sun altitude equations.
 
 ### How it works and Why
 
+![Example Image](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Azimuth-Altitude_schematic.svg/330px-Azimuth-Altitude_schematic.svg.png)
+*Credit wikimedia commons.
+
 Sun position in the sky of a reference point is measured using 2 types of angles: 
 
-- The Azimuth determines the angle of the sun in the sky fron the North direction: at daylight it will always travel from East to West (from 90° to 180° of  Azimuth.
+- The Azimuth determines the angle of the sun in the sky fron the North direction: at daylight it will always travel from East to West (from 90° to 180° of  Azimuth).
 
 - The Elevation angle is the <a href="https://en.wikipedia.org/wiki/Angle#Combining_angle_pairs">complementary angle</a> of the Zenith angle. The later determines the position of the sun from the uppermost point in the sky called ZENITH. 
 
