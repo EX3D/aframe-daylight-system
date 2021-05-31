@@ -31,7 +31,7 @@ Sun position in the sky of a reference point is measured using 2 types of angles
 
 - The Azimuth determines the angle of the sun in the sky fron the North direction: at daylight it will always travel from East to West (from 90° to 180° of  Azimuth.
 
-- The Elevation angle is the <a href="https://en.wikipedia.org/wiki/Angle">complementary angle</a> of the Zenith angle. The later determines the position of the sun from the uppermost point in the sky called ZENITH. 
+- The Elevation angle is the <a href="https://en.wikipedia.org/wiki/Angle#Combining_angle_pairs">complementary angle</a> of the Zenith angle. The later determines the position of the sun from the uppermost point in the sky called ZENITH. 
 
 
 These angles are affected primarily by 3 factors: 
