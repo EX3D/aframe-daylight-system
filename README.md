@@ -6,9 +6,9 @@ W.I.P Component. Based on <a href="https://github.com/feiss/aframe-environment-c
 
 ![Example Image](https://github.com/EX3D/aframe-InstancedMesh/blob/master/aframe%20instancedmesh%20Example.jpg)
 
-Based on aframe-environment-component this component is made for creator that want to se up a particular sun position using, latitude, declination and hour data for a project.
+Based on aframe-environment-component this component is made for creators that want to set up a particular sun position using, latitude, declination and hour data for a project.
 
-This leverages vec3 conversion from sun azimuth and sun altitude equations. 
+This uses vec3 conversion from sun azimuth and sun altitude equations. 
 
 ## WIP
 
