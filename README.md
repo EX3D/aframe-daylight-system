@@ -4,7 +4,7 @@
 W.I.P Component. Based on <a href="https://github.com/feiss/aframe-environment-component">aframe-environment-component </a> a simple daylight system with latitude and hour inputs.
 
 
-![Example Image](https://github.com/EX3D/aframe-InstancedMesh/blob/master/aframe%20instancedmesh%20Example.jpg)
+![Example Image](https://github.com/EX3D/aframe-daylight-system/blob/main/daylightsystem(1).gif)
 
 Based on aframe-environment-component this component is made for creators that want to set up a particular sun position using, latitude, declination and hour data for a project.
 
