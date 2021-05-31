@@ -22,7 +22,7 @@ This uses vec3 conversion from sun azimuth and sun altitude equations.
 ### A-Frame entity notation
 
 ```html 
-     <a-entity id="env" daylight-system = "preset: Bogota;"></a-entity>
+     <a-entity id="env" daylightsystem = "preset: Bogota;"></a-entity>
 ```
 
 ### How it works and Why
