@@ -1,0 +1,342 @@
+AFRAME.registerComponent('daylight-system', {
+    schema: {
+        active: { default: false },
+        preset: { default: 'default' },
+        skyType: { default: 'color', oneOf: ['none', 'color', 'gradient', 'atmosphere'] },
+        skyColor: { type: 'color' },
+        horizonColor: { type: 'color' },
+        lightPosition: { type: 'vec3', default: { x: 0, y: 0.02, z: -0.46 } },
+        fog: { type: 'float', default: 0, min: 0, max: 1 },
+        northDirection: { type: 'float', default: 0, min: 0, max: 360 },
+        timeOfDay: { type: 'float', default: 6, min: 0, max: 24 },
+        latitude: { type: 'float', default: 0, min: -90, max: 90 },
+        declination: { type: 'float', default: 0, min: -23.45, max: 23.45 },
+
+
+    },
+    multiple: false,
+
+    presets: {
+        'none': {},
+        'Bogota': {
+            active: true,
+            seed: 1,
+            skyType: 'atmosphere',
+            skyColor: '#88c',
+            horizonColor: '#ddd',
+            lightPosition: { x: 0, y: 1, z: 0 },
+            fog: 0.78,
+            northDirection: 4.6,
+            timeOfDay: 12,
+            latitude: 48,
+            declination: 0,
+        },
+    },
+
+    init: function() {
+        this.environmentData = {};
+
+        // save current scene fog
+        this.userFog = this.el.sceneEl.getAttribute('fog');
+
+        // create sky
+        this.sky = document.createElement('a-sky');
+        this.sky.setAttribute('theta-length', 200);
+        this.sky.classList.add('environment');
+        this.el.appendChild(this.sky);
+    },
+
+
+    getFogColor: function(skyType, sunHeight) {
+
+        var fogColor;
+        if (skyType == 'color' || skyType == 'none') {
+            fogColor = new THREE.Color(this.environmentData.skyColor);
+        } else if (skyType == 'gradient') {
+            fogColor = new THREE.Color(this.environmentData.horizonColor);
+        } else if (skyType == 'atmosphere') {
+            var fogRatios = [1, 0.5, 0.22, 0.1, 0.05, 0];
+            var fogColors = ['#C0CDCF', '#81ADC5', '#525e62', '#2a2d2d', '#141616', '#000'];
+
+            if (sunHeight <= 0) return '#000';
+
+            sunHeight = Math.min(1, sunHeight);
+
+            for (var i = 0; i < fogRatios.length; i++) {
+                if (sunHeight > fogRatios[i]) {
+                    var c1 = new THREE.Color(fogColors[i - 1]);
+                    var c2 = new THREE.Color(fogColors[i]);
+                    var a = (sunHeight - fogRatios[i]) / (fogRatios[i - 1] - fogRatios[i]);
+                    c2.lerp(c1, a);
+                    fogColor = c2;
+                    break;
+                }
+            }
+        }
+        // dim down the color
+        fogColor.multiplyScalar(0.9);
+    },
+
+    update: function(oldDataNonPreset) {
+        var oldData;
+
+        if (!this.data.preset) {
+            oldData = oldDataNonPreset;
+            this.environmentData = this.data;
+        } else {
+            oldData = AFRAME.utils.clone(this.environmentData);
+            this.environmentData = {};
+            Object.assign(this.environmentData, this.data);
+            Object.assign(this.environmentData, this.presets[this.data.preset]);
+            Object.assign(this.environmentData, this.el.components.environment.attrValue);
+        }
+
+        // Set radians or degrees for calculations
+
+        function degToRad(degrees) {
+            var pi = Math.PI;
+            return degrees * (pi / 180);
+        }
+
+        function radToDeg(radians) {
+            var pi = Math.PI;
+            return radians * (180 / pi);
+        }
+
+        // *STILL NOT USED* ROUND FLOATS OR USE VEC3 ROUND FUNCTION?
+
+        function roundNum(number, precision) {
+            return (Math.floor(number * precision) / precision);
+        }
+
+        // CALCULATE SUN ELEVATION AND AZIMUTH
+
+        var hourAngle = ((360 / 24) * (this.environmentData.timeOfDay));
+        var latitudeAngle = this.environmentData.latitude;
+        var declinationAngle = this.environmentData.declination;
+
+        var solarAltitudeAngle = (-1 * (((Math.sin(degToRad(latitudeAngle))) * (Math.sin(degToRad(declinationAngle)))) + ((Math.cos(degToRad(latitudeAngle))) * (Math.cos(degToRad(declinationAngle))) * (Math.cos(degToRad(hourAngle))))));
+
+        var solarAzimuthAngle = ((((Math.sin(degToRad(declinationAngle))) * (Math.cos(degToRad(latitudeAngle)))) - (Math.cos(degToRad(hourAngle)) * (Math.cos(degToRad(declinationAngle))) * (Math.sin(degToRad(latitudeAngle))))) / (Math.cos(degToRad(solarAltitudeAngle))));
+
+        //THIS IS AWFUL BECAUSE IDONTKNOWHOWTOMAKESHORTERJS.COM
+
+
+        var azimuthVector1 = (Math.sin(degToRad(hourAngle)));
+
+        var azimuthVector2 = (Math.sin(solarAzimuthAngle));
+
+        // FINALLY SET THE SUN POSITION
+
+        var sunPos = new THREE.Vector3(azimuthVector1, solarAltitudeAngle, azimuthVector2);
+        sunPos.normalize();
+
+        var skyType = this.environmentData.skyType;
+
+        if (skyType !== oldData.skyType ||
+            this.environmentData.skyColor != oldData.skyColor ||
+            this.environmentData.horizonColor != oldData.horizonColor) {
+
+            this.sky.removeAttribute('material');
+
+            var mat = {};
+            mat.shader = { 'none': 'flat', 'color': 'flat', 'gradient': 'gradientshader', 'atmosphere': 'skyshader' }[skyType];
+
+            if (skyType == 'color') {
+                mat.color = this.environmentData.skyColor;
+                mat.fog = false;
+            } else if (skyType == 'gradient') {
+                mat.topColor = this.environmentData.skyColor;
+                mat.bottomColor = this.environmentData.horizonColor;
+            }
+            this.sky.setAttribute('material', mat);
+        }
+
+        if (skyType == 'atmosphere') {
+            this.sky.setAttribute('material', { 'sunPosition': sunPos });
+        }
+
+        if (this.environmentData.fog > 0) {
+            this.el.sceneEl.setAttribute('fog', {
+                color: this.getFogColor(skyType, sunPos.y),
+
+            });
+        } else {
+            this.el.sceneEl.removeAttribute('fog');
+        }
+
+        this.sky.setAttribute('visible', skyType !== 'none');
+
+        this.el.setAttribute('visible', this.environmentData.active);
+        if (!this.environmentData.active) {
+            if (this.userFog) {
+                this.el.sceneEl.setAttribute('fog', this.userFog);
+            } else {
+                this.el.sceneEl.removeAttribute('fog');
+            }
+        }
+    },
+
+});
+
+AFRAME.registerShader('skyshader', {
+    schema: {
+        luminance: { type: 'number', default: 1, min: 0, max: 2, is: 'uniform' },
+        turbidity: { type: 'number', default: 2, min: 0, max: 20, is: 'uniform' },
+        reileigh: { type: 'number', default: 1, min: 0, max: 4, is: 'uniform' },
+        mieCoefficient: { type: 'number', default: 0.005, min: 0, max: 0.1, is: 'uniform' },
+        mieDirectionalG: { type: 'number', default: 0.8, min: 0, max: 1, is: 'uniform' },
+        sunPosition: { type: 'vec3', default: { x: 0, y: 0, z: -1 }, is: 'uniform' },
+        color: { type: 'color', default: '#fff' } 
+    },
+
+    vertexShader: [
+        'varying vec3 vWorldPosition;',
+        'void main() {',
+        'vec4 worldPosition = modelMatrix * vec4( position, 1.0 );',
+        'vWorldPosition = worldPosition.xyz;',
+        'gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
+        '}'
+    ].join('\n'),
+
+    fragmentShader: [
+        'uniform sampler2D skySampler;',
+        'uniform vec3 sunPosition;',
+        'varying vec3 vWorldPosition;',
+
+        'vec3 cameraPos = vec3(0., 0., 0.);',
+
+        'uniform float luminance;',
+        'uniform float turbidity;',
+        'uniform float reileigh;',
+        'uniform float mieCoefficient;',
+        'uniform float mieDirectionalG;',
+
+        'const float e = 2.71828182845904523536028747135266249775724709369995957;',
+        'const float pi = 3.141592653589793238462643383279502884197169;',
+
+        'const float n = 1.0003;',
+        'const float N = 0.545E25;',
+        'const float pn = 0.035;',
+        'const vec3 lambda = vec3(680E-9, 550E-9, 450E-9);',
+
+        'const vec3 K = vec3(0.686, 0.678, 0.666);',
+        'const float v = 4.0;',
+
+        'const float rayleighZenithLength = 8.4E3;',
+        'const float mieZenithLength = 1.25E3;',
+        'const vec3 up = vec3(0.0, 1.0, 0.0);',
+
+        'const float EE = 1000.0;',
+        'const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;',
+        'const float cutoffAngle = pi/1.95;',
+        'const float steepness = 1.5;',
+
+        'vec3 totalRayleigh(vec3 lambda)',
+        '{',
+        'return (8.0 * pow(pi, 3.0) * pow(pow(n, 2.0) - 1.0, 2.0) * (6.0 + 3.0 * pn)) / (3.0 * N * pow(lambda, vec3(4.0)) * (6.0 - 7.0 * pn));',
+        '}',
+
+        'vec3 simplifiedRayleigh()',
+        '{',
+        'return 0.0005 / vec3(94, 40, 18);',
+        '}',
+
+        'float rayleighPhase(float cosTheta)',
+        '{   ',
+        'return (3.0 / (16.0*pi)) * (1.0 + pow(cosTheta, 2.0));',
+        '}',
+
+        'vec3 totalMie(vec3 lambda, vec3 K, float T)',
+        '{',
+        'float c = (0.2 * T ) * 10E-18;',
+        'return 0.434 * c * pi * pow((2.0 * pi) / lambda, vec3(v - 2.0)) * K;',
+        '}',
+
+        'float hgPhase(float cosTheta, float g)',
+        '{',
+        'return (1.0 / (4.0*pi)) * ((1.0 - pow(g, 2.0)) / pow(1.0 - 2.0*g*cosTheta + pow(g, 2.0), 1.5));',
+        '}',
+
+        'float sunIntensity(float zenithAngleCos)',
+        '{',
+        'return EE * max(0.0, 1.0 - exp(-((cutoffAngle - acos(zenithAngleCos))/steepness)));',
+        '}',
+
+        '// Filmic ToneMapping http://filmicgames.com/archives/75',
+        'float A = 0.15;',
+        'float B = 0.50;',
+        'float C = 0.10;',
+        'float D = 0.20;',
+        'float E = 0.02;',
+        'float F = 0.30;',
+        'float W = 1000.0;',
+
+        'vec3 Uncharted2Tonemap(vec3 x)',
+        '{',
+        'return ((x*(A*x+C*B)+D*E)/(x*(A*x+B)+D*F))-E/F;',
+        '}',
+
+        'void main() ',
+        '{',
+        'float sunfade = 1.0-clamp(1.0-exp((sunPosition.y/450000.0)),0.0,1.0);',
+
+        'float reileighCoefficient = reileigh - (1.0* (1.0-sunfade));',
+
+        'vec3 sunDirection = normalize(sunPosition);',
+
+        'float sunE = sunIntensity(dot(sunDirection, up));',
+
+        'vec3 betaR = simplifiedRayleigh() * reileighCoefficient;',
+
+        'vec3 betaM = totalMie(lambda, K, turbidity) * mieCoefficient;',
+
+        'float zenithAngle = acos(max(0.0, dot(up, normalize(vWorldPosition - cameraPos))));',
+        'float sR = rayleighZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));',
+        'float sM = mieZenithLength / (cos(zenithAngle) + 0.15 * pow(93.885 - ((zenithAngle * 180.0) / pi), -1.253));',
+
+        'vec3 Fex = exp(-(betaR * sR + betaM * sM));',
+
+        'float cosTheta = dot(normalize(vWorldPosition - cameraPos), sunDirection);',
+
+        'float rPhase = rayleighPhase(cosTheta*0.5+0.5);',
+        'vec3 betaRTheta = betaR * rPhase;',
+
+        'float mPhase = hgPhase(cosTheta, mieDirectionalG);',
+        'vec3 betaMTheta = betaM * mPhase;',
+
+        'vec3 Lin = pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * (1.0 - Fex),vec3(1.5));',
+        'Lin *= mix(vec3(1.0),pow(sunE * ((betaRTheta + betaMTheta) / (betaR + betaM)) * Fex,vec3(1.0/2.0)),clamp(pow(1.0-dot(up, sunDirection),5.0),0.0,1.0));',
+
+        'vec3 direction = normalize(vWorldPosition - cameraPos);',
+        'float theta = acos(direction.y); // elevation --> y-axis, [-pi/2, pi/2]',
+        'float phi = atan(direction.z, direction.x); // azimuth --> x-axis [-pi/2, pi/2]',
+        'vec2 uv = vec2(phi, theta) / vec2(2.0*pi, pi) + vec2(0.5, 0.0);',
+        'vec3 L0 = vec3(0.1) * Fex;',
+
+        'float sundisk = smoothstep(sunAngularDiameterCos,sunAngularDiameterCos+0.00002,cosTheta);',
+        'L0 += (sunE * 19000.0 * Fex)*sundisk;',
+
+        'vec3 whiteScale = 1.0/Uncharted2Tonemap(vec3(W));',
+
+        'vec3 texColor = (Lin+L0);   ',
+        'texColor *= 0.04 ;',
+        'texColor += vec3(0.0,0.001,0.0025)*0.3;',
+
+        'float g_fMaxLuminance = 1.0;',
+        'float fLumScaled = 0.1 / luminance;     ',
+        'float fLumCompressed = (fLumScaled * (1.0 + (fLumScaled / (g_fMaxLuminance * g_fMaxLuminance)))) / (1.0 + fLumScaled); ',
+
+        'float ExposureBias = fLumCompressed;',
+
+        'vec3 curr = Uncharted2Tonemap((log2(2.0/pow(luminance,4.0)))*texColor);',
+        'vec3 color = curr*whiteScale;',
+
+        'vec3 retColor = pow(color,vec3(1.0/(1.2+(1.2*sunfade))));',
+
+        'gl_FragColor.rgb = retColor;',
+
+        'gl_FragColor.a = 1.0;',
+        '}'
+    ].join('\n')
+});
