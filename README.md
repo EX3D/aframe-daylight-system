@@ -1,4 +1,3 @@
 # aframe-daylight-system
 
-<p><a href="https://github.com/feiss/aframe-environment-component">Based on aframe-environment-component a simple daylight system with latituda en hour inputs.
-</a></p>
+Based on <a href="https://github.com/feiss/aframe-environment-component">aframe-environment-component </a> a simple daylight system with latituda and hour inputs.
