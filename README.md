@@ -16,7 +16,13 @@ This uses vec3 conversion from sun azimuth and sun altitude equations.
 
 - Add North Offset.......wip
 
-- Merge  light object functionality from aframe-environment-component or convince the to add this kind of input. That would be awesome........wip
+- Merge light object functionality from aframe-environment-component or convince them to add this kind of input. That would be awesome........wip
+
+- Remake the way it parses timeOfDay and delcination values to something like:
+
+```html 
+     <a-entity id="env" daylightsystem = "timeOfDay: 10:35am; timeOfYear: June22"></a-entity>
+```
 
 
 ### A-Frame entity notation
