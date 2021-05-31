@@ -43,7 +43,7 @@ These angles are affected primarily by 3 factors:
 
 - Latitude is the relative position of the reference point in a spheroid in relation to it's poles: it affects the Azimuth and Elevation. It varies from -90° to +90°. At the equator the latitude will be 0° and so without any other variable the position of the sun will be parallel to the East-West direction. On the contrary at 90° the position of the sun will be perpendicular to the vertical axis.
 
-- Declination describes the <a href="https://en.wikipedia.org/wiki/Season">inclination of the axis of rotation of the spheroid in relation to the sun.</a> Because we still live in this tiny particle of sun dust this value varies from -24.45° and + 23.45°. It affects the Elevation angle and determines the overall lenght of daylight. Positive declination numbers result in a South-leaning sun at equator.
+- Declination describes the <a href="https://en.wikipedia.org/wiki/Season">inclination of the axis of rotation of the spheroid in relation to the orbital plane.</a> Because we still live in this tiny particle of sun dust this value varies from -24.45° and + 23.45°. It affects the Elevation angle and determines the overall lenght of daylight. Positive declination numbers result in a South-leaning sun at equator.
 
 
 **These are all basic factors that DO no account for other elements that affect the sun position such as orbital positions and global altitude.
