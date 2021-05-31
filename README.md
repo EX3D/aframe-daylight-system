@@ -12,7 +12,7 @@ This uses vec3 conversion from sun azimuth and sun altitude equations.
 
 ## WIP
 
-- Implement schema components: Longitude (adds variance to both sun altitude and azimuth. See: https://en.wikipedia.org/wiki/Solar_azimuth_angle) ...........done
+- Implement schema components: Longitude (adds variance to both sun altitude and azimuth. See: https://en.wikipedia.org/wiki/Position_of_the_Sun) ...........done
 
 - Add North Offset.......wip
 
