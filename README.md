@@ -28,7 +28,7 @@ This uses vec3 conversion from sun azimuth and sun altitude equations.
 ### A-Frame entity notation
 
 ```html 
-     <a-entity id="env" daylightsystem = "preset: Bogota;"></a-entity>
+     <a-entity id="env" daylightsystem = "timeOfDay: 9.45; declination: -12.45; latitude: -4.8;"></a-entity>
 ```
 
 ### How it works and Why
@@ -58,9 +58,9 @@ These angles are affected primarily by 3 factors:
 
 | Property | Description | Range | Default Value | Implemented |
 | -------- | ----------- | ------------- | ------------| ------------|
-| `northDirection` | Offsets the north direction of this system | 0 to 360 | `0` | No |
-| `timeOfDay` | Base 24 hours and works with fractions. | 0 to 24 | `6` | Yes |
-| `latitude` | Positive values are North hemisphere | -90 to 90 | `0` | Yes |
+| `northDirection` | Offsets the north direction of this system | 0.0 to 360.0 | `0` | No |
+| `timeOfDay` | Base 24 hours. | 0.0 to 24.0 | `6` | Yes |
+| `latitude` | Positive values are North hemisphere | -90.0 to 90.0 | `0` | Yes |
 | `declination` | Positive values are "Winter" | -23.45 to 23.45 | `0` | Yes |
 
 ## TESTED ON
