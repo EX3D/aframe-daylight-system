@@ -61,7 +61,7 @@ These angles are affected primarily by 3 factors:
 | `northDirection` | Offsets the north direction of this system | 0.0 to 360.0 | `0` | No |
 | `timeOfDay` | Base 24 hours. | 0.0 to 24.0 | `6` | Yes |
 | `latitude` | Positive values are North hemisphere | -90.0 to 90.0 | `0` | Yes |
-| `declination` | Positive values are "Winter" | -23.45 to 23.45 | `0` | Yes |
+| `declination` | Positive values are "Winter" on positive latitudes. | -23.45 to 23.45 | `0` | Yes |
 
 ## TESTED ON
 A-Frame v1.1.0
